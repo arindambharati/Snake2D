@@ -1,5 +1,9 @@
 ﻿using UnityEngine;
 
+/// <summary>
+/// This script is implements randomization of the food
+/// Bounds from BoxCollider2D is used to randomize the food positions each time the snake collides with it.
+/// </summary>
 public class FoodController : MonoBehaviour
 {
     [SerializeField] private BoxCollider2D gridArea;
@@ -8,6 +12,7 @@ public class FoodController : MonoBehaviour
     {
         RandomizeFoodPosition();
     }
+
     private void RandomizeFoodPosition()
     {
         Bounds bounds = this.gridArea.bounds;

@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
 /// <summary>
 /// This script is implementing the Snake Movement.
@@ -9,6 +10,30 @@
 public class SnakeController : MonoBehaviour
 {
     private Vector2 _direction;
+    private List<Transform> _bodySegments;
+    [SerializeField] private Transform bodySegmentPrefab;
+    private int initialSize;
+    private void Awake()
+    {
+        initialSize = 4;
+        _bodySegments = new List<Transform>();
+    }
+
+    private void SnakeSize()
+    {
+        _bodySegments.Add(this.transform);
+        for (int i = 1; i < this.initialSize; i++){
+            _bodySegments.Add(Instantiate(this.bodySegmentPrefab));
+        }
+
+        this.transform.position = Vector2.zero;
+    }
+
+    private void Start()
+    {
+        SnakeSize();
+    }
+
 
     private void Update()
     {
@@ -28,14 +53,34 @@ public class SnakeController : MonoBehaviour
 
     private void FixedUpdate()
     {
+        for(int i = _bodySegments.Count - 1; i > 0; i--){
+            _bodySegments[i].position = _bodySegments[i - 1].position;
+        }
+
         SnakeMovement();
     }
 
     private void SnakeMovement()
     {
         this.transform.position = new Vector2(
-            Mathf.Round(this.transform.position.x) + _direction.x,
+            Mathf.Round(this.transform.position.x) + _direction.x ,
             Mathf.Round(this.transform.position.y) + _direction.y
-            );
+            ) ;
     }
+
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (collision.gameObject.CompareTag("Food")){
+            Grow();
+        }
+    }
+
+    private void Grow()
+    {
+        Transform segment = Instantiate(this.bodySegmentPrefab);
+        //grab the position of the last segment prefab
+        segment.position = _bodySegments[_bodySegments.Count - 1].position;
+        _bodySegments.Add(segment);
+    }
+
 }
