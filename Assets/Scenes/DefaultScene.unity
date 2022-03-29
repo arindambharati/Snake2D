@@ -208,7 +208,7 @@ BoxCollider2D:
   m_Enabled: 1
   m_Density: 1
   m_Material: {fileID: 0}
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_UsedByEffector: 0
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0}
@@ -321,6 +321,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d8f50bbb7c0b0674ba147e0ee4f40b38, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  bodySegmentPrefab: {fileID: 1535089883641309495, guid: 96889ca316767d94688147417a743945,
+    type: 3}
 --- !u!1 &210017908
 GameObject:
   m_ObjectHideFlags: 0
@@ -776,7 +778,7 @@ GameObject:
   - component: {fileID: 1086712106}
   m_Layer: 0
   m_Name: Food
-  m_TagString: Untagged
+  m_TagString: Food
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
