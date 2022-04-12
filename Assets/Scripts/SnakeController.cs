@@ -26,51 +26,51 @@ public class SnakeController : MonoBehaviour
     private Vector2Int gridPosition;
     private Vector2Int gridMoveDirection;
 
-    private List<Transform> _bodySegments;
+    private List<Transform> _bodySegments = new List<Transform>();
     [SerializeField] private Transform bodySegmentPrefab;
-   // public Transform myTransform;
-    private float gridMoveTimer;
-    private float gridMoveTimerMax;
+    [SerializeField] private float gridMoveTimer;
+    [SerializeField] private float gridMoveTimerMax;
 
     private bool hasInput;
-
+    private int i;
     private void Awake()
     {
         initialBodySize = 1;
         gridPosition = new Vector2Int(0, 0);
-        _bodySegments = new List<Transform>();
-        gridMoveTimerMax = 0.05f;
+       // _bodySegments = new List<Transform>();
+        gridMoveTimerMax = 0.1f;
         gridMoveTimer = gridMoveTimerMax;
         hasInput = false;
+        i = 0;
         //SnakeSize();
     }
 
+
     private void SnakeSize()
     {
-         _bodySegments.Add(this.transform);
-        for (int i = 1; i < this.initialBodySize; i++)
+        _bodySegments.Add(this.transform);
+/*      for (int i = 1; i < this.initialBodySize; i++)
         {
             _bodySegments.Add(Instantiate(this.bodySegmentPrefab));
             Debug.Log("i= " + i);
-        }
+        }*/
 
         this.transform.position = Vector2.zero;
     }
 
-/*    private void Start()
-    {
 
+    private void Start()
+    {
         SnakeSize();
-    }*/
+    }
 
 
     private void Update()
     {
-       
         PlayerInput();
         SnakeMovement();
-
     }
+
 
     private void PlayerInput()
     {
@@ -100,6 +100,7 @@ public class SnakeController : MonoBehaviour
         }
     }
 
+
     private void SnakeMovement()
     {
         if (hasInput == true)
@@ -107,44 +108,62 @@ public class SnakeController : MonoBehaviour
             gridMoveTimer += Time.deltaTime;
             if (gridMoveTimer >= gridMoveTimerMax)
             {
-                //we can also set gridMoveTimer to 0 instead of gridMoveTimerMax as it will keep reseting to 0 and then increase to 1 and repeat
-                _bodySegments.Add(transform);
+              //  _bodySegments.Add(transform);
 
                 UpdateGridPosition();
 
-                gridMoveTimer -= gridMoveTimerMax;
+                gridMoveTimer -= gridMoveTimerMax; //we can also set gridMoveTimer to 0 instead of gridMoveTimerMax as it will keep reseting to 0 and then increase to 1 and repeat
 
-/*                if (_bodySegments.Count >= initialBodySize + 1)
+                /*                if (_bodySegments.Count >= initialBodySize + 1)
+                                {
+                                    _bodySegments.RemoveAt(_bodySegments.Count - initialBodySize);
+                                }
+                */
+
+
+                /*                for (int i = _bodySegments.Count; i > 0; i--)
+                                {
+
+                                    _bodySegments[i].position = _bodySegments[i - 1].position;
+                                    Debug.Log("i= " + i);
+                                }
+                */
+
+                /*                if (i == 0)
+                                {
+                                    i = 0;
+                                }
+                                else
+                                {
+                                    i = _bodySegments.Count;
+                                }*/
+                //i = 0;
+                // i = 0;
+                Vector3 swapPosition = new Vector3(0, 0, 0);
+                foreach ( var segment in _bodySegments)
                 {
-                    _bodySegments.RemoveAt(_bodySegments.Count - initialBodySize);
+                    if (segment == _bodySegments[0])
+                    {
+                        // i++;
+                        swapPosition = segment.position;
+                        continue;
+                    }
+
+                    Vector3 swapPosition2 = segment.position;
+                    segment.position = swapPosition;
+                    swapPosition = swapPosition2;
+                   // var i = _bodySegments.IndexOf(segment);
+                   // segment.position = _bodySegments[i-1].position;
+                   // i++;
                 }
-*/
-/*                for (int i = 0; i < _bodySegments.Count; i++)
-                {
-                    //Vector2Int snakeMovePosition = _bodySegments[i];
-
-                    _bodySegments[i].transform.position = _bodySegments[i + 1].transform.position;
-                    Debug.Log("i= " + i);
-                }*/
-
-                for (int i = _bodySegments.Count; i > 0; i--)
-                {
-                    
-                    _bodySegments[i].position = _bodySegments[i - 1].position;
-                    Debug.Log("i= " + i);
-                }
-
-
             }
         }
-        
         transform.position = new Vector2(gridPosition.x, gridPosition.y);
     }
 
 
     private void UpdateGridPosition()
     {
-        
         switch (moveDirection)
         {
             default:
@@ -181,7 +200,4 @@ public class SnakeController : MonoBehaviour
         segment.position = _bodySegments[_bodySegments.Count - 1].position;
         _bodySegments.Add(segment);
     }
-
-
-
 }
