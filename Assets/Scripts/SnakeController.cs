@@ -19,6 +19,13 @@ public class SnakeController : MonoBehaviour
         Right
     }
 
+
+    public enum SnakeID
+    {
+        Snake1,
+        Snake2
+    }
+    
     private int initialBodySize;
     private Direction moveDirection;
 
@@ -30,9 +37,16 @@ public class SnakeController : MonoBehaviour
     [SerializeField] private Transform bodySegmentPrefab;
     [SerializeField] private float gridMoveTimer;
     [SerializeField] private float gridMoveTimerMax;
+    [SerializeField] private TextMeshProUGUI player1Score;
+    [SerializeField] private TextMeshProUGUI winnerText;
+    [SerializeField] private GameObject gameOverUI;
+    private SnakeID snakeID;
 
     private bool hasInput;
     private int i;
+    private int score;
+
+
     private void Awake()
     {
         initialBodySize = 1;
@@ -49,12 +63,6 @@ public class SnakeController : MonoBehaviour
     private void SnakeSize()
     {
         _bodySegments.Add(this.transform);
-/*      for (int i = 1; i < this.initialBodySize; i++)
-        {
-            _bodySegments.Add(Instantiate(this.bodySegmentPrefab));
-            Debug.Log("i= " + i);
-        }*/
-
         this.transform.position = Vector2.zero;
     }
 
@@ -65,14 +73,94 @@ public class SnakeController : MonoBehaviour
     }
 
 
-    private void Update()
+    private void OnTriggerEnter2D(Collider2D collision)
     {
-        PlayerInput();
-        SnakeMovement();
+        if (collision.gameObject.CompareTag("Food"))
+        {
+            SoundManager.Instance.PlaySound(Sound.Eat);
+            Grow();
+        }
+        if (collision.gameObject.CompareTag("Frog"))
+        {
+            SoundManager.Instance.PlaySound(Sound.Eat);
+            DecreaseSize();
+            collision.gameObject.SetActive(false);
+        }
+        if (collision.gameObject.CompareTag("Walls"))
+        {
+            ScreenSwrap();
+            SoundManager.Instance.PlaySound(Sound.Teleport);
+
+        }
+        if (collision.gameObject.CompareTag("Body") && isShiledActive == false)
+        {
+
+            GameOver(gameObject.name);
+        }
+  
+    }
+
+    private void GameOver(string looserName)
+    {
+        string winner = null;
+        this.enabled = false;
+        SoundManager.Instance.PlayBGM(Sound.GameOver);
+        gameOverUI.SetActive(true);
+        if (looserName == "Snake1")
+        {
+            winner = "Snake2";
+        }
+        if (looserName == "Snake2")
+        {
+            winner = "Snake1";
+        }
+        winnerText.text = winner + " Won";
+        Destroy(gameObject, 2f);
+    }
+
+    private void ScreenSwrap()
+    {
+        Vector3 newPos = transform.position;
+        if (up == false || down == false)
+        {
+            newPos.y = -(transform.position.y);
+        }
+        if (left == false || right == false)
+        {
+            newPos.x = -(transform.position.x);
+        }
+        transform.position = newPos;
     }
 
 
-    private void PlayerInput()
+    private void Update()
+    {
+       
+        PlayerInputs();
+        SnakeMovement();
+    }
+
+    private void PlayerInputs()
+    {
+        switch (snakeID)
+        {
+            case SnakeID.Snake1:
+                {
+                    Player1Input();
+                    break;
+                }
+
+            case SnakeID.Snake2:
+                {
+                    player2Input();
+                    break;
+                }
+
+
+        }
+    }
+
+    private void Player1_Input()
     {
         if (Input.GetKeyDown(KeyCode.UpArrow) && (moveDirection != Direction.Down))
         {
@@ -93,6 +181,34 @@ public class SnakeController : MonoBehaviour
             hasInput = true;
         }
         else if (Input.GetKeyDown(KeyCode.RightArrow) && (moveDirection != Direction.Left))
+        {
+            moveDirection = Direction.Right;
+            gridPosition.x += 1;
+            hasInput = true;
+        }
+    }
+
+    private void Player2_Input()
+    {
+        if (Input.GetKeyDown(KeyCode.W) && (moveDirection != Direction.Down))
+        {
+            moveDirection = Direction.Up;
+            gridPosition.y += 1;
+            hasInput = true;
+        }
+        else if (Input.GetKeyDown(KeyCode.S) && (moveDirection != Direction.Up))
+        {
+            moveDirection = Direction.Down;
+            gridPosition.y -= 1;
+            hasInput = true;
+        }
+        else if (Input.GetKeyDown(KeyCode.A) && (moveDirection != Direction.Right))
+        {
+            moveDirection = Direction.Left;
+            gridPosition.x -= 1;
+            hasInput = true;
+        }
+        else if (Input.GetKeyDown(KeyCode.D) && (moveDirection != Direction.Left))
         {
             moveDirection = Direction.Right;
             gridPosition.x += 1;
@@ -186,6 +302,7 @@ public class SnakeController : MonoBehaviour
 
 
 
+
     private void OnTriggerEnter2D(Collider2D collision)
     {
         if (collision.gameObject.CompareTag("Food")){
@@ -199,5 +316,24 @@ public class SnakeController : MonoBehaviour
         //grab the position of the last segment prefab
         segment.position = _bodySegments[_bodySegments.Count - 1].position;
         _bodySegments.Add(segment);
+    }
+
+
+    private void DecreaseSize()
+    {
+        score--;
+        player1Score.text = " Score:" + score;
+        int bodyCount = body.Count - 1;
+        if (bodyCount >= 1)
+        {
+            Destroy(body[bodyCount].gameObject);
+            body.RemoveAt(bodyCount);
+
+        }
+        else
+        {
+            return;
+        }
+
     }
 }
